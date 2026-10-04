@@ -63,4 +63,8 @@ $script:choices.Enqueue('2')
 $script:choices.Enqueue('q')
 Show-DesktopEdgerMenu
 Assert ($script:launches[-1][1][-1] -eq 'Restore') 'Menu did not dispatch Restore.'
+$script:choices.Enqueue('3')
+$script:choices.Enqueue('q')
+Show-DesktopEdgerMenu
+Assert ($script:choices.Count -eq 0) 'Tool failure must leave the menu usable.'
 Write-Host 'Quick-start checks passed (downloads and launches mocked).'
