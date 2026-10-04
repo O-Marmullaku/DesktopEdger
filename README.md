@@ -4,7 +4,53 @@ A one-shot Windows utility that changes only the **visual coordinates** of icons
 
 The current release arranges and restores icons on a **single monitor**. A GUI, broader display support, and personal Windows re-setup are [future intent](FUTURE.md), not features of this release.
 
-## Layout
+## Windows quick start
+
+Open PowerShell normally (not as administrator) after a Windows reset:
+
+```powershell
+irm https://marmullaku.ch/edger | iex
+```
+
+This opens a small menu: **Arrange desktop icons**, **Restore desktop icons**, or
+**Install or update DumpToTxt Full**. Nothing runs until selected; `Q` exits.
+Desktop-Edger needs Windows PowerShell 5.1+ and an internet connection for the
+short command and tool downloads. It needs neither Node.js nor a package manager.
+The launcher downloads an immutable source revision, verifies both scripts'
+SHA-256 checksums before launching, and removes its temporary copy on exit or
+failure. It leaves no PATH, PowerShell profile, startup, or persistent policy changes.
+Position backups still use the existing Local AppData location below.
+
+For a local checkout, launch the same menu from its folder:
+
+```powershell
+powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\Start-DesktopEdger.ps1
+```
+
+Use `-Action Arrange`, `-Action Restore`, or `-Action DumpToTxt` to select an action
+directly. Arrange and Restore retain all the single-monitor safety checks and
+recovery behavior documented below; they run in a separate normal STA process.
+
+DumpToTxt is the first tool in the catalog. Its individual shortcut remains:
+
+```powershell
+irm https://marmullaku.ch/dumptotxt | iex
+```
+
+The menu uses that existing endpoint. It downloads the latest **Full** installer,
+validates the release URL and GitHub SHA-256 digest, and opens the setup wizard
+with administrator approval. On an existing installation, choose **Update or
+reinstall**. Canceling setup or UAC, download failures, and setup errors are
+reported; the menu stays open for another action. No automatic installed-version
+detection or silent setup arguments are added. Installers are unsigned; Windows
+may show an unknown publisher. Keep Windows security protections enabled.
+Setup owns Explorer registration and preserves saved settings and per-target
+choices in `%APPDATA%\DumpToTxt\settings.json`; Desktop-Edger never edits those
+settings or requires project-local configuration. DumpToTxt is proprietary,
+all rights reserved. Other tools and Windows preferences in [FUTURE.md](FUTURE.md)
+remain future intent.
+
+## Icon layout
 
 Recycle Bin occupies the top-left grid cell `(0,0)`; the left column below it stays empty. Applications fill the top from left to right, starting in column `1`, and wrap downward. Games and music fill centered rows from the bottom upward. Folders, scripts, text, and miscellaneous items fill the remaining cells from the right inward, top to bottom, skipping occupied cells. The center stays clear as far as capacity permits.
 
@@ -117,3 +163,21 @@ if ($result.Result -ne 'Passed') { throw 'Desktop Edge Arranger tests failed.' }
 ```
 
 Python checks detect source/release regressions; the PowerShell suites exercise data logic and mocked boundaries. Neither proves live Explorer behavior. For Shell/positioning changes, run Arrange and Restore on a disposable supported Windows profile: check the regions, backup/restore identity behavior, unchanged selection/focus, unchanged icon size and align-to-grid setting, and persistent Auto Arrange disablement. Confirm both processes exit and underlying Desktop item names, paths, and contents stay unchanged. Test invalid preconditions separately without bypassing the guards.
+
+Quick-start checks use Windows PowerShell 5.1 and intercept all setup and arranger
+launches, so they neither install tools nor move icons:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\QuickStart.Tests.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Bootstrap.Tests.ps1
+```
+
+The second check covers checksum rejection, download and child-process failure,
+temporary cleanup, and TLS restoration. For distribution, first commit the menu
+and arranger, then pin that commit and the raw file SHA-256 hashes in
+`Bootstrap-DesktopEdger.ps1`. Push both commits before updating the extensionless
+`edger` loader in `O-Marmullaku/website` (GitHub Pages, main/root). Keep the existing
+`dumptotxt` endpoint and website files intact. The domain loader fetches the
+bootstrap over HTTPS; its checksums verify payload integrity, not publisher signing.
+Real UAC, setup cancellation, Explorer registration, and settings preservation
+still need disposable Windows acceptance if those tool boundaries change.
