@@ -20,6 +20,7 @@ The launcher downloads an immutable source revision, verifies both scripts'
 SHA-256 checksums before launching, and removes its temporary copy on exit or
 failure. It leaves no PATH, PowerShell profile, startup, or persistent policy changes.
 Position backups still use the existing Local AppData location below.
+The quick-start launcher rejects elevated sessions.
 
 For a local checkout, launch the same menu from its folder:
 
@@ -56,7 +57,7 @@ Recycle Bin occupies the top-left grid cell `(0,0)`; the left column below it st
 
 Placement is deterministic for the same items and grid geometry. If the full layout cannot fit without violating these regions, Arrange aborts rather than returning a partial plan.
 
-## Requirements
+## Icon arranger requirements
 
 - Windows 10 or Windows 11, with a normal Explorer desktop session.
 - Windows PowerShell 5.1 or later in STA; the supplied launcher uses Windows PowerShell.
